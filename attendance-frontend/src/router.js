@@ -5,6 +5,7 @@ import Students from './pages/Students.vue'
 import Classes from './pages/Classes.vue'
 import Sections from './pages/Sections.vue'
 import Attendance from './pages/Attendance.vue'
+import Reports from './pages/Reports.vue'
 import Login from './pages/Login.vue'
 
 const routes = [
@@ -42,6 +43,12 @@ const routes = [
     path: '/attendance',
     name: 'Attendance',
     component: Attendance,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/reports',
+    name: 'Reports',
+    component: Reports,
     meta: { requiresAuth: true }
   }
 ]

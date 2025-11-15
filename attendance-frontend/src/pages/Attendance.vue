@@ -10,10 +10,19 @@
         </div>
         <div class="form-group">
           <label>Class</label>
-          <select v-model="selectedClass" class="form-control" @change="loadStudents">
+          <select v-model="selectedClass" class="form-control" @change="onClassChange">
             <option value="">Select Class</option>
             <option v-for="cls in classStore.classes" :key="cls.id" :value="cls.id">
-              {{ cls.name }} - {{ cls.section }}
+              Class {{ cls.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Section</label>
+          <select v-model="selectedSection" class="form-control" @change="loadStudents" :disabled="!selectedClass">
+            <option value="">Select Section</option>
+            <option v-for="section in sectionStore.sections" :key="section.id" :value="section.id">
+              {{ section.name }}
             </option>
           </select>
         </div>
@@ -23,11 +32,11 @@
       <div v-else-if="studentStore.error" class="error">
         {{ studentStore.error }}
       </div>
-      <div v-else-if="!selectedClass" class="info-message">
-        Please select a class to load students and record attendance.
+      <div v-else-if="!selectedClass || !selectedSection" class="info-message">
+        Please select both class and section to load students and record attendance.
       </div>
-      <div v-else-if="studentStore.students.length === 0 && selectedClass" class="info-message">
-        No students found in this class. Please add students first.
+      <div v-else-if="studentStore.students.length === 0 && selectedClass && selectedSection" class="info-message">
+        No students found in this class and section. Please add students first.
       </div>
       <div v-else-if="studentStore.students.length > 0">
         <div class="bulk-actions">
@@ -103,13 +112,16 @@ import { ref, computed, onMounted } from 'vue'
 import { useStudentStore } from '../stores/student'
 import { useAttendanceStore } from '../stores/attendance'
 import { useClassStore } from '../stores/class'
+import { useSectionStore } from '../stores/section'
 
 const studentStore = useStudentStore()
 const attendanceStore = useAttendanceStore()
 const classStore = useClassStore()
+const sectionStore = useSectionStore()
 
 const attendanceDate = ref(new Date().toISOString().split('T')[0])
 const selectedClass = ref('')
+const selectedSection = ref('')
 const attendance = ref({})
 
 onMounted(async () => {
@@ -117,10 +129,18 @@ onMounted(async () => {
   studentStore.clearState()
   attendanceStore.clearState()
   await classStore.fetchAllClasses()
+  await sectionStore.fetchAllSections()
 })
 
+const onClassChange = () => {
+  // Reset section when class changes
+  selectedSection.value = ''
+  studentStore.students = []
+  attendance.value = {}
+}
+
 const loadStudents = async () => {
-  if (!selectedClass.value) {
+  if (!selectedClass.value || !selectedSection.value) {
     studentStore.students = []
     attendance.value = {}
     return
@@ -129,6 +149,7 @@ const loadStudents = async () => {
   try {
     await studentStore.fetchStudents({
       class_id: selectedClass.value,
+      section_id: selectedSection.value,
       per_page: 100
     })
     
@@ -186,6 +207,7 @@ const submitAttendance = async () => {
     alert('Attendance recorded successfully!')
     attendance.value = {}
     selectedClass.value = ''
+    selectedSection.value = ''
   } catch (error) {
     alert('Failed to record attendance: ' + (error.message || 'Unknown error'))
   }
@@ -195,7 +217,7 @@ const submitAttendance = async () => {
 <style scoped>
 .attendance-form {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-bottom: 2rem;
 }

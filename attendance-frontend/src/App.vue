@@ -9,6 +9,7 @@
           <router-link to="/classes" class="nav-link">Classes</router-link>
           <router-link to="/sections" class="nav-link">Sections</router-link>
           <router-link to="/attendance" class="nav-link">Attendance</router-link>
+          <router-link to="/reports" class="nav-link">Reports</router-link>
           <div class="user-menu">
             <span class="user-name">{{ authStore.user?.name }}</span>
             <button @click="handleLogout" class="btn-logout">Logout</button>
