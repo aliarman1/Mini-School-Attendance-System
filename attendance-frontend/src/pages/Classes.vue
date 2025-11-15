@@ -65,6 +65,45 @@
       </div>
     </div>
 
+    <!-- Delete Warning Modal -->
+    <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
+      <div class="notification-modal warning" @click.stop>
+        <div class="modal-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete <strong>Class {{ deleteTarget?.name }}</strong>? All students in this class will need to be reassigned.</p>
+        <div class="modal-actions-inline">
+          <button class="btn btn-secondary" @click="closeDeleteModal">Cancel</button>
+          <button class="btn btn-danger" @click="confirmDelete">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success/Error Modal -->
+    <div v-if="showNotificationModal" class="modal-overlay" @click="closeNotificationModal">
+      <div class="notification-modal" :class="modalType" @click.stop>
+        <div class="modal-icon">
+          <svg v-if="modalType === 'success'" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <h3>{{ modalTitle }}</h3>
+        <p>{{ modalMessage }}</p>
+        <button class="btn btn-primary" @click="closeNotificationModal">OK</button>
+      </div>
+    </div>
+
     <!-- Add/Edit Modal -->
     <div v-if="showAddModal" class="modal" @click.self="closeModal">
       <div class="modal-content">
@@ -128,6 +167,12 @@ const formData = ref({
   capacity: 30,
   description: ''
 })
+const showNotificationModal = ref(false)
+const modalType = ref('success')
+const modalTitle = ref('')
+const modalMessage = ref('')
+const showDeleteModal = ref(false)
+const deleteTarget = ref(null)
 
 onMounted(async () => {
   await fetchClasses()
@@ -161,14 +206,16 @@ const saveClass = async () => {
 
     if (editMode.value) {
       await classStore.updateClass(formData.value.id, submitData)
+      showNotification('success', 'Class Updated!', `Class ${formData.value.name} has been updated successfully.`)
     } else {
       await classStore.createClass(submitData)
+      showNotification('success', 'Class Created!', `Class ${formData.value.name} has been added successfully.`)
     }
     closeModal()
     await fetchClasses()
   } catch (error) {
     const errorMsg = error.response?.data?.message || error.message
-    alert('Failed to save class: ' + errorMsg)
+    showNotification('error', 'Operation Failed', `Failed to save class: ${errorMsg}`)
   }
 }
 
@@ -183,15 +230,40 @@ const editClass = (cls) => {
   showAddModal.value = true
 }
 
-const deleteClassConfirm = async (id) => {
-  if (confirm('Are you sure you want to delete this class? All students in this class will need to be reassigned.')) {
-    try {
-      await classStore.deleteClass(id)
-      await fetchClasses()
-    } catch (error) {
-      alert('Failed to delete class: ' + (error.response?.data?.message || error.message))
-    }
+const deleteClassConfirm = (id) => {
+  const cls = classStore.classes.find(c => c.id === id)
+  deleteTarget.value = cls
+  showDeleteModal.value = true
+}
+
+const confirmDelete = async () => {
+  try {
+    const className = deleteTarget.value?.name || ''
+    await classStore.deleteClass(deleteTarget.value.id)
+    closeDeleteModal()
+    showNotification('success', 'Class Deleted!', `Class ${className} has been deleted successfully.`)
+    await fetchClasses()
+  } catch (error) {
+    closeDeleteModal()
+    const errorMsg = error.response?.data?.message || error.message
+    showNotification('error', 'Delete Failed', `Failed to delete class: ${errorMsg}`)
   }
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  deleteTarget.value = null
+}
+
+const showNotification = (type, title, message) => {
+  modalType.value = type
+  modalTitle.value = title
+  modalMessage.value = message
+  showNotificationModal.value = true
+}
+
+const closeNotificationModal = () => {
+  showNotificationModal.value = false
 }
 
 const closeModal = () => {
@@ -344,5 +416,133 @@ textarea.form-control {
 
 .btn-secondary:hover:not(:disabled) {
   background: #4b5563;
+}
+
+/* Notification Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.notification-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.notification-modal.success .modal-icon {
+  background: #d4edda;
+  color: #28a745;
+}
+
+.notification-modal.error .modal-icon {
+  background: #f8d7da;
+  color: #dc3545;
+}
+
+.notification-modal.warning .modal-icon {
+  background: #fff3cd;
+  color: #ffc107;
+}
+
+.notification-modal h3 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.notification-modal.success h3 {
+  color: #28a745;
+}
+
+.notification-modal.error h3 {
+  color: #dc3545;
+}
+
+.notification-modal.warning h3 {
+  color: #ffc107;
+}
+
+.notification-modal p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.notification-modal .btn {
+  min-width: 120px;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+}
+
+.modal-actions-inline {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-actions-inline .btn {
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+  .notification-modal {
+    padding: 2rem;
+    max-width: 90%;
+  }
+
+  .modal-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .notification-modal h3 {
+    font-size: 1.5rem;
+  }
 }
 </style>
