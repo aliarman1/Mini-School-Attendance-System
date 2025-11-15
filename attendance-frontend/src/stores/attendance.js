@@ -69,6 +69,15 @@ export const useAttendanceStore = defineStore('attendance', {
       } finally {
         this.loading = false
       }
+    },
+
+    // Clear store state
+    clearState() {
+      this.attendances = []
+      this.statistics = null
+      this.todayAttendance = null
+      this.error = null
+      this.loading = false
     }
   }
 })

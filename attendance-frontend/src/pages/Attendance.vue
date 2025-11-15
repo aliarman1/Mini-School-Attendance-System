@@ -25,6 +25,15 @@
       </div>
 
       <div v-if="studentStore.loading" class="loading">Loading students...</div>
+      <div v-else-if="studentStore.error" class="error">
+        {{ studentStore.error }}
+      </div>
+      <div v-else-if="!selectedClass" class="info-message">
+        Please select a class to load students and record attendance.
+      </div>
+      <div v-else-if="studentStore.students.length === 0 && selectedClass" class="info-message">
+        No students found in this class. Please add students first.
+      </div>
       <div v-else-if="studentStore.students.length > 0">
         <div class="bulk-actions">
           <button class="btn" @click="markAll('present')">Mark All Present</button>
@@ -108,26 +117,37 @@ const recordedBy = ref('Teacher')
 const attendance = ref({})
 
 onMounted(() => {
-  // Initialize
+  // Clear any previous data and errors when component mounts
+  studentStore.clearState()
+  attendanceStore.clearState()
 })
 
 const loadStudents = async () => {
-  if (!selectedClass.value) return
+  if (!selectedClass.value) {
+    studentStore.students = []
+    attendance.value = {}
+    return
+  }
   
-  await studentStore.fetchStudents({
-    class: selectedClass.value,
-    per_page: 100
-  })
-  
-  // Initialize attendance records
-  attendance.value = {}
-  studentStore.students.forEach(student => {
-    attendance.value[student.id] = {
-      student_id: student.id,
-      status: 'present',
-      note: ''
-    }
-  })
+  try {
+    await studentStore.fetchStudents({
+      class: selectedClass.value,
+      per_page: 100
+    })
+    
+    // Initialize attendance records
+    attendance.value = {}
+    studentStore.students.forEach(student => {
+      attendance.value[student.id] = {
+        student_id: student.id,
+        status: 'present',
+        note: ''
+      }
+    })
+  } catch (error) {
+    console.error('Failed to load students:', error)
+    attendance.value = {}
+  }
 }
 
 const markAll = (status) => {
@@ -218,5 +238,14 @@ const submitAttendance = async () => {
   width: 100%;
   padding: 1rem;
   font-size: 1.125rem;
+}
+
+.info-message {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+  background: #ecf0f1;
+  border-radius: 4px;
+  font-size: 1.1rem;
 }
 </style>

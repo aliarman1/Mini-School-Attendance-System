@@ -77,6 +77,14 @@ export const useStudentStore = defineStore('student', {
       } finally {
         this.loading = false
       }
+    },
+
+    // Clear store state
+    clearState() {
+      this.students = []
+      this.currentStudent = null
+      this.error = null
+      this.loading = false
     }
   }
 })
