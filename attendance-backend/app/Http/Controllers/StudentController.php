@@ -29,12 +29,12 @@ class StudentController extends Controller
         }
         
         // Filter by class
-        if ($request->has('class')) {
+        if ($request->filled('class')) {
             $query->where('class', $request->input('class'));
         }
         
         // Filter by section
-        if ($request->has('section')) {
+        if ($request->filled('section')) {
             $query->where('section', $request->input('section'));
         }
         

@@ -26,21 +26,21 @@ class AttendanceController extends Controller
         $query = Attendance::with('student');
         
         // Filter by date range
-        if ($request->has('start_date')) {
+        if ($request->filled('start_date')) {
             $query->where('date', '>=', $request->input('start_date'));
         }
         
-        if ($request->has('end_date')) {
+        if ($request->filled('end_date')) {
             $query->where('date', '<=', $request->input('end_date'));
         }
         
         // Filter by status
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
         }
         
         // Filter by student
-        if ($request->has('student_id')) {
+        if ($request->filled('student_id')) {
             $query->where('student_id', $request->input('student_id'));
         }
         

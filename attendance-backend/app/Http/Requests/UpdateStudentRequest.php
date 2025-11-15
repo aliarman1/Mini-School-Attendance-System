@@ -21,7 +21,9 @@ class UpdateStudentRequest extends FormRequest
      */
     public function rules(): array
     {
-        $studentId = $this->route('student');
+        // Get the student ID from the route (route model binding provides the model instance)
+        $student = $this->route('student');
+        $studentId = $student ? $student->id : null;
         
         return [
             'name' => 'sometimes|required|string|max:255',
