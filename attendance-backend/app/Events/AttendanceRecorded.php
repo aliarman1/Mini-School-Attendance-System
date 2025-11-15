@@ -14,12 +14,14 @@ class AttendanceRecorded
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $attendance;
+
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct($attendance)
     {
-        //
+        $this->attendance = $attendance;
     }
 
     /**

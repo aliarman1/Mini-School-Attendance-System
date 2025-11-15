@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AttendanceResource extends JsonResource
+class StudentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,12 +16,15 @@ class AttendanceResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'student_id' => $this->student_id,
-            'student' => new StudentResource($this->whenLoaded('student')),
-            'date' => $this->date?->format('Y-m-d'),
-            'status' => $this->status,
-            'note' => $this->note,
-            'recorded_by' => $this->recorded_by,
+            'class' => $this->class,
+            'section' => $this->section,
+            'photo' => $this->photo ? url('storage/' . $this->photo) : null,
+            'attendance_percentage' => $this->when(
+                $request->has('include_attendance'),
+                fn() => $this->getAttendancePercentage()
+            ),
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
         ];

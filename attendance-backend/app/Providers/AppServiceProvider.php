@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register event listeners
+        \Event::listen(
+            \App\Events\AttendanceRecorded::class,
+            \App\Listeners\SendAttendanceNotification::class,
+        );
     }
 }

@@ -1,59 +1,212 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# School Attendance System - Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel REST API for managing student attendance with advanced features including bulk recording, reports, events, and caching.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 🎓 Student Management
+- CRUD operations for students
+- Search and filter by class/section
+- Photo upload support
+- Laravel Resource API responses
+- Pagination support
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 📊 Attendance Module
+- Bulk attendance recording
+- Query-optimized attendance reports
+- Monthly attendance reports with eager loading
+- Statistics with Redis caching
+- Today's attendance summary
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🚀 Advanced Features
+- **Service Layer**: Separated business logic in AttendanceService
+- **Artisan Command**: `attendance:generate-report {month} {class}`
+- **Events & Listeners**: AttendanceRecorded event for notifications
+- **Redis Caching**: Optimized statistics queries
+- **CORS**: Configured for frontend communication
+- **Validation**: Request validation for all inputs
 
-## Learning Laravel
+## Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Framework**: Laravel 11
+- **Database**: MySQL/PostgreSQL/SQLite
+- **Authentication**: Laravel Sanctum
+- **Caching**: Redis (optional, defaults to database)
+- **Testing**: PHPUnit
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-## Laravel Sponsors
+### Prerequisites
+- PHP 8.2+
+- Composer
+- MySQL/PostgreSQL or SQLite
+- Redis (optional)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Setup Steps
 
-### Premium Partners
+1. **Clone the repository**
+```bash
+cd attendance-backend
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+2. **Install dependencies**
+```bash
+composer install
+```
 
-## Contributing
+3. **Environment configuration**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. **Configure database in .env**
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=attendance_db
+DB_USERNAME=root
+DB_PASSWORD=your_password
 
-## Code of Conduct
+# Or use SQLite for quick setup
+DB_CONNECTION=sqlite
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. **Configure frontend URL for CORS**
+```env
+FRONTEND_URL=http://localhost:5173
+```
 
-## Security Vulnerabilities
+6. **Optional: Enable Redis caching**
+```env
+CACHE_STORE=redis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+7. **Run migrations**
+```bash
+php artisan migrate
+```
+
+8. **Seed database with test data**
+```bash
+php artisan db:seed
+```
+
+9. **Create storage link**
+```bash
+php artisan storage:link
+```
+
+10. **Start the development server**
+```bash
+php artisan serve
+```
+
+API will be available at `http://localhost:8000`
+
+## API Endpoints
+
+### Students
+- `GET /api/students` - List students (with pagination, search, filter)
+- `POST /api/students` - Create student
+- `GET /api/students/{id}` - Get student
+- `PUT /api/students/{id}` - Update student
+- `DELETE /api/students/{id}` - Delete student
+
+### Attendance
+- `POST /api/attendance/bulk` - Record bulk attendance
+- `GET /api/attendance` - List attendance records
+- `GET /api/attendance/{id}` - Get attendance record
+- `PUT /api/attendance/{id}` - Update attendance
+- `DELETE /api/attendance/{id}` - Delete attendance
+- `GET /api/attendance/report/monthly?month=YYYY-MM&class=10A` - Monthly report
+- `GET /api/attendance/statistics` - Attendance statistics (cached)
+- `GET /api/attendance/today` - Today's attendance
+
+## Artisan Commands
+
+### Generate Monthly Report
+```bash
+php artisan attendance:generate-report 2025-11 10A
+```
+
+## Testing
+
+Run the test suite:
+```bash
+php artisan test
+```
+
+Run specific test:
+```bash
+php artisan test --filter StudentTest
+```
+
+## Architecture
+
+### SOLID Principles
+- **Single Responsibility**: Controllers handle HTTP, Services handle business logic
+- **Open/Closed**: Service layer extensible without modifying controllers
+- **Liskov Substitution**: Interface-based design
+- **Interface Segregation**: Specific request validation classes
+- **Dependency Inversion**: Dependency injection throughout
+
+### Service Layer
+`AttendanceService` encapsulates:
+- Bulk attendance recording with transactions
+- Report generation with eager loading
+- Statistics calculation with caching
+- Business logic separation
+
+### Events & Listeners
+- `AttendanceRecorded` event fires on each attendance record
+- `SendAttendanceNotification` listener (queued) logs/sends notifications
+- Easily extensible for email/SMS notifications
+
+### Caching Strategy
+- Statistics cached for 1 hour
+- Automatic cache invalidation on new records
+- Supports both Redis and database caching
+
+## Code Quality
+
+- Request validation for all inputs
+- Resource transformers for consistent API responses
+- Query optimization with eager loading
+- Transaction support for data integrity
+- Error handling with try-catch blocks
+
+## Test Credentials
+
+After seeding, use these sample students:
+- STU001 - John Doe (Class 10A)
+- STU002 - Jane Smith (Class 10A)
+- STU003 - Mike Johnson (Class 10A)
+- ...and 7 more
+
+## Project Structure
+
+```
+app/
+├── Console/Commands/      # Artisan commands
+├── Events/               # Event classes
+├── Http/
+│   ├── Controllers/      # API controllers
+│   ├── Requests/         # Form validation
+│   └── Resources/        # API resources
+├── Listeners/            # Event listeners
+├── Models/               # Eloquent models
+└── Services/             # Business logic
+database/
+├── migrations/           # Database migrations
+└── seeders/              # Database seeders
+tests/
+└── Feature/              # Feature tests
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT License
