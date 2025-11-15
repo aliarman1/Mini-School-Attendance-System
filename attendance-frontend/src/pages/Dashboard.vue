@@ -66,6 +66,7 @@
           <thead>
             <tr>
               <th>Student</th>
+              <th>Class</th>
               <th>Status</th>
               <th>Recorded By</th>
               <th>Time</th>
@@ -74,6 +75,9 @@
           <tbody>
             <tr v-for="record in todayData.records.slice(0, 10)" :key="record.id">
               <td>{{ record.student?.name || 'N/A' }}</td>
+              <td>
+                <span class="class-badge">{{ record.student?.class || 'N/A' }}</span>
+              </td>
               <td>
                 <span :class="'status-badge status-' + record.status">
                   {{ record.status }}
@@ -199,6 +203,16 @@ const formatTime = (datetime) => {
   height: 300px;
   margin: 2rem auto;
   max-width: 400px;
+}
+
+.class-badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #e3f2fd;
+  color: #1976d2;
+  display: inline-block;
 }
 
 .status-badge {
