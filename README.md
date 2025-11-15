@@ -9,6 +9,7 @@ This project is a complete student attendance management system built with moder
 ### Key Highlights
 
 - **Full-Stack Solution**: Laravel 11 + Vue 3 SPA architecture
+- **🐳 Docker Ready**: Complete containerization with docker-compose
 - **Real-time Statistics**: Live attendance metrics with caching
 - **Bulk Operations**: Record attendance for entire classes at once
 - **Advanced Filtering**: Multi-criteria search and filtering
@@ -49,6 +50,9 @@ student/
 │   │   └── App.vue             Main application
 │   └── public/                 Static assets
 │
+├── docker-compose.yml          Production Docker setup
+├── docker-compose.dev.yml      Development Docker setup
+├── DOCKER.md                   Complete Docker documentation
 ├── README.md                   This file
 └── AI_WORKFLOW.md              AI assistance documentation
 ```
@@ -103,12 +107,38 @@ student/
 
 ## Quick Start
 
+### 🐳 Docker Setup (Recommended)
+
+**Fastest way to get started with full production setup:**
+
+```bash
+# Start all services (MySQL, Redis, Backend, Frontend)
+docker-compose up -d
+
+# Access the application
+# Frontend: http://localhost:5173
+# Backend API: http://localhost:8000/api
+
+# Login credentials
+# Email: admin@school.com
+# Password: password
+```
+
+**That's it!** Everything is configured and ready to use.
+
+For detailed Docker documentation, see: [DOCKER.md](DOCKER.md)
+
+---
+
+### Manual Installation
+
 ### Prerequisites
 
 - PHP 8.2+ with Composer
 - Node.js 18+ with npm
 - MySQL/PostgreSQL or SQLite
 - Redis (optional, for caching)
+- **OR Docker & Docker Compose** (for containerized setup)
 
 ### Installation
 
@@ -361,6 +391,63 @@ Dashboard shows live statistics:
 4. **Interface Segregation**: Small, focused interfaces
 5. **Dependency Inversion**: Services injected via dependency injection
 
+## 🐳 Docker Deployment
+
+### Complete Containerization
+
+This project includes full Docker support with:
+
+**Production Setup:**
+- Multi-stage builds for optimized images
+- MySQL 8.0 database with persistent volumes
+- Redis 7 caching layer
+- PHP 8.2-FPM with Nginx
+- Vue production build with Nginx
+- Health checks for all services
+- Automatic migrations and seeding
+
+**Development Setup:**
+- Hot module replacement (HMR)
+- Volume mounting for live code changes
+- Debug mode enabled
+- No rebuild required for code changes
+
+### Quick Start with Docker
+
+```bash
+# Production mode
+docker-compose up -d
+
+# Development mode with hot-reload
+docker-compose -f docker-compose.dev.yml up
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+### What's Running
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| Frontend | 5173 | Vue 3 SPA |
+| Backend | 8000 | Laravel API |
+| MySQL | 3306 | Database |
+| Redis | 6379 | Cache |
+
+### Docker Benefits
+
+✅ **One Command Setup** - No manual dependency installation  
+✅ **Consistent Environment** - Same setup across all machines  
+✅ **Production Ready** - Deploy anywhere Docker runs  
+✅ **Isolated Services** - No conflicts with local installations  
+✅ **Easy Scaling** - Docker Swarm or Kubernetes ready  
+✅ **Quick Cleanup** - Remove everything with one command  
+
+**Complete Docker documentation:** [DOCKER.md](DOCKER.md)
+
 ## Development with AI
 
 This project was developed with significant AI assistance (OpenCode/Claude). See [AI_WORKFLOW.md](AI_WORKFLOW.md) for detailed documentation on:
@@ -371,7 +458,7 @@ This project was developed with significant AI assistance (OpenCode/Claude). See
 
 **AI-Generated Code**: ~93%  
 **Manual Coding**: ~7%  
-**Development Time**: ~3 hours (vs. ~27 hours estimated without AI)
+**Development Time**: ~4 hours (vs. ~27 hours estimated without AI)
 
 ## Common Issues & Solutions
 

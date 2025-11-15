@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: attendance-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: attendance_db
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: attendance_user
+      MYSQL_PASSWORD: attendance_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - attendance-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: attendance-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - attendance-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Laravel Backend API
+  backend:
+    build:
+      context: ./attendance-backend
+      dockerfile: Dockerfile
+    container_name: attendance-backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=attendance_db
+      - DB_USERNAME=attendance_user
+      - DB_PASSWORD=attendance_pass
+      - CACHE_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FRONTEND_URL=http://localhost:5173
+    volumes:
+      - ./attendance-backend:/var/www/html
+      - backend_storage:/var/www/html/storage
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - attendance-network
+    command: >
+      sh -c "
+        if [ ! -f .env ]; then cp .env.example .env; fi &&
+        composer install --no-dev --optimize-autoloader --no-interaction &&
+        php artisan key:generate --force &&
+        php artisan config:cache &&
+        php artisan route:cache &&
+        php artisan migrate --force &&
+        php artisan db:seed --force &&
+        /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+      "
+
+  # Vue Frontend
+  frontend:
+    build:
+      context: ./attendance-frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000/api
+    container_name: attendance-frontend
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - attendance-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_storage:
+    driver: local
+
+networks:
+  attendance-network:
+    driver: bridge

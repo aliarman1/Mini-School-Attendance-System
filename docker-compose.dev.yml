@@ -1,0 +1,103 @@
+# Development Docker Compose Configuration
+# Use this for local development with hot-reload
+
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: attendance-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: attendance_db
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: attendance_user
+      MYSQL_PASSWORD: attendance_pass
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - attendance-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: attendance-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - attendance-network
+
+  # Laravel Backend API (Development)
+  backend:
+    image: php:8.2-fpm-alpine
+    container_name: attendance-backend-dev
+    restart: unless-stopped
+    working_dir: /var/www/html
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=attendance_db
+      - DB_USERNAME=attendance_user
+      - DB_PASSWORD=attendance_pass
+      - CACHE_DRIVER=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FRONTEND_URL=http://localhost:5173
+    volumes:
+      - ./attendance-backend:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - attendance-network
+    command: >
+      sh -c "
+        apk add --no-cache git curl libpng-dev libzip-dev zip unzip oniguruma-dev bash sqlite &&
+        docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd &&
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&
+        composer install &&
+        if [ ! -f .env ]; then cp .env.example .env; fi &&
+        php artisan key:generate &&
+        php artisan migrate --seed &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
+
+  # Vue Frontend (Development with Hot Reload)
+  frontend:
+    image: node:18-alpine
+    container_name: attendance-frontend-dev
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    volumes:
+      - ./attendance-frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - attendance-network
+    command: >
+      sh -c "
+        npm install &&
+        npm run dev -- --host 0.0.0.0
+      "
+
+volumes:
+  mysql_data_dev:
+    driver: local
+
+networks:
+  attendance-network:
+    driver: bridge
