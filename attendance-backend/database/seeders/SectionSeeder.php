@@ -25,18 +25,6 @@ class SectionSeeder extends Seeder
                 'name' => 'C',
                 'description' => 'Section C',
             ],
-            [
-                'name' => 'Science',
-                'description' => 'Science Stream',
-            ],
-            [
-                'name' => 'Commerce',
-                'description' => 'Commerce Stream',
-            ],
-            [
-                'name' => 'General',
-                'description' => 'General Stream',
-            ],
         ];
 
         foreach ($sections as $section) {
