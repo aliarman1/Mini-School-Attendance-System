@@ -24,8 +24,8 @@ class StoreStudentRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'student_id' => 'required|string|unique:students,student_id|max:50',
-            'class' => 'required|string|max:50',
-            'section' => 'required|string|max:50',
+            'class_id' => 'required|exists:classes,id',
+            'section_id' => 'required|exists:sections,id',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }
@@ -41,8 +41,10 @@ class StoreStudentRequest extends FormRequest
             'name.required' => 'Student name is required',
             'student_id.required' => 'Student ID is required',
             'student_id.unique' => 'This student ID already exists',
-            'class.required' => 'Class is required',
-            'section.required' => 'Section is required',
+            'class_id.required' => 'Class is required',
+            'class_id.exists' => 'Selected class does not exist',
+            'section_id.required' => 'Section is required',
+            'section_id.exists' => 'Selected section does not exist',
             'photo.image' => 'File must be an image',
             'photo.mimes' => 'Image must be jpeg, png, or jpg format',
             'photo.max' => 'Image size must not exceed 2MB',

@@ -18,8 +18,14 @@ class StudentResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'student_id' => $this->student_id,
-            'class' => $this->class,
-            'section' => $this->section,
+            'class_id' => $this->class_id,
+            'section_id' => $this->section_id,
+            'class' => $this->whenLoaded('class', function () {
+                return new ClassResource($this->class);
+            }),
+            'section' => $this->whenLoaded('section', function () {
+                return new SectionResource($this->section);
+            }),
             'photo' => $this->photo ? url('storage/' . $this->photo) : null,
             'attendance_percentage' => $this->when(
                 $request->has('include_attendance'),

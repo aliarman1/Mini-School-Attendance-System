@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import Dashboard from './pages/Dashboard.vue'
 import Students from './pages/Students.vue'
+import Classes from './pages/Classes.vue'
+import Sections from './pages/Sections.vue'
 import Attendance from './pages/Attendance.vue'
 import Login from './pages/Login.vue'
 
@@ -22,6 +24,18 @@ const routes = [
     path: '/students',
     name: 'Students',
     component: Students,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/classes',
+    name: 'Classes',
+    component: Classes,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/sections',
+    name: 'Sections',
+    component: Sections,
     meta: { requiresAuth: true }
   },
   {

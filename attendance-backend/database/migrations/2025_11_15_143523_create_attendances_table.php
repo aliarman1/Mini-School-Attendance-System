@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('date');
             $table->enum('status', ['present', 'absent', 'late']);
             $table->text('note')->nullable();
-            $table->string('recorded_by');
+            $table->foreignId('recorded_by_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
             
             // Prevent duplicate attendance records for the same student on the same date

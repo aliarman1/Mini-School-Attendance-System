@@ -14,9 +14,11 @@ class DatabaseSeeder extends Seeder
         $this->command->info('🌱 Starting database seeding...');
         $this->command->newLine();
 
-        // Run seeders in order (users must be created before attendance)
+        // Run seeders in order (classes and sections must be created before students, users before attendance)
         $this->call([
             UserSeeder::class,
+            ClassSeeder::class,
+            SectionSeeder::class,
             StudentSeeder::class,
             AttendanceSeeder::class,
         ]);

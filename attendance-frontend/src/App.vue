@@ -6,6 +6,8 @@
         <div class="nav-links">
           <router-link to="/" class="nav-link">Dashboard</router-link>
           <router-link to="/students" class="nav-link">Students</router-link>
+          <router-link to="/classes" class="nav-link">Classes</router-link>
+          <router-link to="/sections" class="nav-link">Sections</router-link>
           <router-link to="/attendance" class="nav-link">Attendance</router-link>
           <div class="user-menu">
             <span class="user-name">{{ authStore.user?.name }}</span>

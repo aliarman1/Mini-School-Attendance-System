@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Student extends Model
 {
@@ -12,10 +13,26 @@ class Student extends Model
     protected $fillable = [
         'name',
         'student_id',
-        'class',
-        'section',
+        'class_id',
+        'section_id',
         'photo',
     ];
+
+    /**
+     * Get the class that the student belongs to.
+     */
+    public function class(): BelongsTo
+    {
+        return $this->belongsTo(ClassModel::class, 'class_id');
+    }
+
+    /**
+     * Get the section that the student belongs to.
+     */
+    public function section(): BelongsTo
+    {
+        return $this->belongsTo(Section::class, 'section_id');
+    }
 
     /**
      * Get the attendances for the student.

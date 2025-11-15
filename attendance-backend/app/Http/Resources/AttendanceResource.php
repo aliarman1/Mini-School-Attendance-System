@@ -21,7 +21,14 @@ class AttendanceResource extends JsonResource
             'date' => $this->date?->format('Y-m-d'),
             'status' => $this->status,
             'note' => $this->note,
-            'recorded_by' => $this->recorded_by,
+            'recorded_by_id' => $this->recorded_by_id,
+            'recorded_by' => $this->whenLoaded('recordedBy', function () {
+                return [
+                    'id' => $this->recordedBy->id,
+                    'name' => $this->recordedBy->name,
+                    'email' => $this->recordedBy->email,
+                ];
+            }),
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
         ];

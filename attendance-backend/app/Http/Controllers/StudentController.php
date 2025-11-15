@@ -17,7 +17,7 @@ class StudentController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Student::query();
+        $query = Student::query()->with(['class', 'section']);
         
         // Search by name or student_id
         if ($request->has('search')) {
@@ -28,14 +28,14 @@ class StudentController extends Controller
             });
         }
         
-        // Filter by class
-        if ($request->filled('class')) {
-            $query->where('class', $request->input('class'));
+        // Filter by class_id
+        if ($request->filled('class_id')) {
+            $query->where('class_id', $request->input('class_id'));
         }
         
-        // Filter by section
-        if ($request->filled('section')) {
-            $query->where('section', $request->input('section'));
+        // Filter by section_id
+        if ($request->filled('section_id')) {
+            $query->where('section_id', $request->input('section_id'));
         }
         
         // Pagination
@@ -82,6 +82,8 @@ class StudentController extends Controller
      */
     public function show(Student $student): JsonResponse
     {
+        $student->load(['class', 'section']);
+        
         return response()->json([
             'success' => true,
             'data' => new StudentResource($student),

@@ -52,11 +52,10 @@ class AttendanceSeeder extends Seeder
                 
                 Attendance::create([
                     'student_id' => $student->id,
-                    'user_id' => $randomUser->id,
+                    'recorded_by_id' => $randomUser->id,
                     'date' => $date,
                     'status' => $status,
                     'note' => $note,
-                    'recorded_by' => $randomUser->name,
                 ]);
                 
                 $recordCount++;

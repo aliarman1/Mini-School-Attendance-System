@@ -12,10 +12,9 @@
           <label>Class</label>
           <select v-model="selectedClass" class="form-control" @change="loadStudents">
             <option value="">Select Class</option>
-            <option value="9A">Class 9A</option>
-            <option value="9B">Class 9B</option>
-            <option value="10A">Class 10A</option>
-            <option value="10B">Class 10B</option>
+            <option v-for="cls in classStore.classes" :key="cls.id" :value="cls.id">
+              {{ cls.name }} - {{ cls.section }}
+            </option>
           </select>
         </div>
       </div>
@@ -103,18 +102,21 @@
 import { ref, computed, onMounted } from 'vue'
 import { useStudentStore } from '../stores/student'
 import { useAttendanceStore } from '../stores/attendance'
+import { useClassStore } from '../stores/class'
 
 const studentStore = useStudentStore()
 const attendanceStore = useAttendanceStore()
+const classStore = useClassStore()
 
 const attendanceDate = ref(new Date().toISOString().split('T')[0])
 const selectedClass = ref('')
 const attendance = ref({})
 
-onMounted(() => {
+onMounted(async () => {
   // Clear any previous data and errors when component mounts
   studentStore.clearState()
   attendanceStore.clearState()
+  await classStore.fetchAllClasses()
 })
 
 const loadStudents = async () => {
@@ -126,7 +128,7 @@ const loadStudents = async () => {
   
   try {
     await studentStore.fetchStudents({
-      class: selectedClass.value,
+      class_id: selectedClass.value,
       per_page: 100
     })
     

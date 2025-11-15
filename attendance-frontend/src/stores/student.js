@@ -36,7 +36,11 @@ export const useStudentStore = defineStore('student', {
       this.loading = true
       this.error = null
       try {
-        const response = await api.post('/students', studentData)
+        const response = await api.post('/students', studentData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         this.students.unshift(response.data.data)
         return response.data
       } catch (error) {
@@ -51,12 +55,27 @@ export const useStudentStore = defineStore('student', {
       this.loading = true
       this.error = null
       try {
-        const response = await api.put(`/students/${id}`, studentData)
-        const index = this.students.findIndex(s => s.id === id)
-        if (index !== -1) {
-          this.students[index] = response.data.data
+        // Laravel doesn't support PUT with multipart/form-data, so we use POST with _method
+        if (studentData instanceof FormData) {
+          studentData.append('_method', 'PUT')
+          const response = await api.post(`/students/${id}`, studentData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          const index = this.students.findIndex(s => s.id === id)
+          if (index !== -1) {
+            this.students[index] = response.data.data
+          }
+          return response.data
+        } else {
+          const response = await api.put(`/students/${id}`, studentData)
+          const index = this.students.findIndex(s => s.id === id)
+          if (index !== -1) {
+            this.students[index] = response.data.data
+          }
+          return response.data
         }
-        return response.data
       } catch (error) {
         this.error = error.response?.data?.message || 'Failed to update student'
         throw error

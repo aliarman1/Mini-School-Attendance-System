@@ -21,7 +21,6 @@ class AttendanceService
         try {
             $attendances = [];
             $date = Carbon::parse($data['date']);
-            $recordedBy = $data['recorded_by'] ?? null;
             
             foreach ($data['attendances'] as $record) {
                 $attendance = Attendance::updateOrCreate(
@@ -32,8 +31,7 @@ class AttendanceService
                     [
                         'status' => $record['status'],
                         'note' => $record['note'] ?? null,
-                        'recorded_by' => $recordedBy,
-                        'user_id' => $userId,
+                        'recorded_by_id' => $userId,
                     ]
                 );
                 
@@ -58,12 +56,12 @@ class AttendanceService
     /**
      * Generate monthly attendance report with eager loading
      */
-    public function generateMonthlyReport(string $month, string $class): array
+    public function generateMonthlyReport(string $month, $classId): array
     {
         $startDate = Carbon::parse($month)->startOfMonth();
         $endDate = Carbon::parse($month)->endOfMonth();
         
-        $students = Student::where('class', $class)
+        $students = Student::where('class_id', $classId)
             ->with(['attendances' => function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('date', [$startDate, $endDate]);
             }])
@@ -143,7 +141,7 @@ class AttendanceService
     {
         $today = Carbon::today();
         
-        $attendances = Attendance::with('student')
+        $attendances = Attendance::with(['student.class', 'recordedBy'])
             ->where('date', $today)
             ->get();
         

@@ -28,8 +28,8 @@ class UpdateStudentRequest extends FormRequest
         return [
             'name' => 'sometimes|required|string|max:255',
             'student_id' => 'sometimes|required|string|unique:students,student_id,' . $studentId . '|max:50',
-            'class' => 'sometimes|required|string|max:50',
-            'section' => 'sometimes|required|string|max:50',
+            'class_id' => 'sometimes|required|exists:classes,id',
+            'section_id' => 'sometimes|required|exists:sections,id',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
     }
@@ -45,8 +45,10 @@ class UpdateStudentRequest extends FormRequest
             'name.required' => 'Student name is required',
             'student_id.required' => 'Student ID is required',
             'student_id.unique' => 'This student ID already exists',
-            'class.required' => 'Class is required',
-            'section.required' => 'Section is required',
+            'class_id.required' => 'Class is required',
+            'class_id.exists' => 'Selected class does not exist',
+            'section_id.required' => 'Section is required',
+            'section_id.exists' => 'Selected section does not exist',
             'photo.image' => 'File must be an image',
             'photo.mimes' => 'Image must be jpeg, png, or jpg format',
             'photo.max' => 'Image size must not exceed 2MB',

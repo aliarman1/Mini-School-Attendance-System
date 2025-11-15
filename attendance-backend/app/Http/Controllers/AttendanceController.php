@@ -23,7 +23,7 @@ class AttendanceController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Attendance::with('student');
+        $query = Attendance::with(['student.class', 'recordedBy']);
         
         // Filter by date range
         if ($request->filled('start_date')) {
@@ -42,6 +42,13 @@ class AttendanceController extends Controller
         // Filter by student
         if ($request->filled('student_id')) {
             $query->where('student_id', $request->input('student_id'));
+        }
+        
+        // Filter by class
+        if ($request->filled('class_id')) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('class_id', $request->input('class_id'));
+            });
         }
         
         $perPage = $request->input('per_page', 15);
@@ -89,7 +96,7 @@ class AttendanceController extends Controller
      */
     public function show(Attendance $attendance): JsonResponse
     {
-        $attendance->load('student');
+        $attendance->load(['student.class', 'recordedBy']);
         
         return response()->json([
             'success' => true,
@@ -136,13 +143,13 @@ class AttendanceController extends Controller
     {
         $validated = $request->validate([
             'month' => 'required|date_format:Y-m',
-            'class' => 'required|string',
+            'class_id' => 'required|exists:classes,id',
         ]);
         
         try {
             $report = $this->attendanceService->generateMonthlyReport(
                 $validated['month'],
-                $validated['class']
+                $validated['class_id']
             );
             
             return response()->json([
@@ -150,7 +157,7 @@ class AttendanceController extends Controller
                 'data' => $report,
                 'meta' => [
                     'month' => $validated['month'],
-                    'class' => $validated['class'],
+                    'class_id' => $validated['class_id'],
                 ],
             ]);
         } catch (\Exception $e) {
