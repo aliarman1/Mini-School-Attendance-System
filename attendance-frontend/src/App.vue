@@ -128,12 +128,21 @@ const getUserInitials = (name) => {
   box-sizing: border-box;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 #app {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #f5f7fa;
   min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Navigation Bar Styles */
@@ -144,37 +153,44 @@ const getUserInitials = (name) => {
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 100%;
 }
 
 .nav-container {
-  max-width: 1400px;
+  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
+  padding: 0 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
+  gap: 1rem;
   min-height: 70px;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(10px);
+  flex-shrink: 0;
 }
 
 .logo-icon svg {
   color: white;
+  width: 24px;
+  height: 24px;
 }
 
 .logo-text {
@@ -183,60 +199,72 @@ const getUserInitials = (name) => {
 }
 
 .logo-title {
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   font-weight: 700;
   line-height: 1.2;
   margin: 0;
+  white-space: nowrap;
 }
 
 .logo-subtitle {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   opacity: 0.9;
   margin: 0;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 .mobile-menu-btn {
   display: none;
-  background: none;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
   cursor: pointer;
   padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .nav-content {
   display: flex;
   align-items: center;
-  gap: 3rem;
+  justify-content: space-between;
+  gap: 1rem;
+  grid-column: 2 / 4;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  flex: 1;
 }
 
 .nav-link {
   color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
 }
 
 .nav-link svg {
   opacity: 0.8;
+  flex-shrink: 0;
 }
 
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
 }
 
 .nav-link.router-link-active {
@@ -251,52 +279,60 @@ const getUserInitials = (name) => {
 .user-menu {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50px;
   backdrop-filter: blur(10px);
+  white-space: nowrap;
 }
 
 .user-avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: white;
+  flex-shrink: 0;
 }
 
 .user-name {
   color: white;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 .btn-logout {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.btn-logout svg {
+  flex-shrink: 0;
 }
 
 .btn-logout:hover {
@@ -307,17 +343,20 @@ const getUserInitials = (name) => {
 
 /* Main Content */
 .main-content {
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 0 2rem;
-  min-height: calc(100vh - 120px);
+  flex: 1;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: calc(100vh - 70px);
 }
 
 .main-content-full {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
+  flex: 1;
 }
 
 /* Button Styles */
@@ -379,6 +418,15 @@ const getUserInitials = (name) => {
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   margin-bottom: 1.5rem;
+  overflow-x: auto;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+    border-radius: 8px;
+  }
 }
 
 /* Form Styles */
@@ -412,6 +460,25 @@ const getUserInitials = (name) => {
 table {
   width: 100%;
   border-collapse: collapse;
+  overflow-x: auto;
+  display: table;
+}
+
+@media (max-width: 768px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  table thead {
+    display: table-header-group;
+  }
+  
+  table tbody {
+    display: table-row-group;
+  }
 }
 
 table th,
@@ -419,6 +486,14 @@ table td {
   padding: 0.875rem;
   text-align: left;
   border-bottom: 1px solid #e5e7eb;
+}
+
+@media (max-width: 768px) {
+  table th,
+  table td {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
 }
 
 table th {
@@ -432,6 +507,16 @@ table th {
 
 table tr:hover {
   background: #f9fafb;
+}
+
+/* Page Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 /* Loading & Error States */
@@ -451,9 +536,72 @@ table tr:hover {
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
+
+/* Large Desktop - Show all nav items */
+@media (min-width: 1400px) {
+  .nav-container {
+    max-width: 1400px;
+    padding: 0 2rem;
+  }
+  
+  .nav-link span {
+    display: inline;
+  }
+}
+
+/* Medium Desktop - Compact nav items */
+@media (min-width: 1025px) and (max-width: 1399px) {
+  .nav-container {
+    padding: 0 1.5rem;
+  }
+  
+  .nav-link {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.6rem;
+  }
+  
+  .user-name {
+    display: none;
+  }
+}
+
+/* Tablet - Hide some nav text, show icons only */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .nav-link span {
+    display: none;
+  }
+  
+  .nav-link {
+    padding: 0.5rem;
+  }
+  
+  .user-name {
+    display: none;
+  }
+  
+  .btn-logout span {
+    display: none;
+  }
+}
+
+/* Mobile - Hamburger menu */
+@media (max-width: 768px) {
+  .nav-container {
+    grid-template-columns: auto 1fr auto;
+    padding: 0 1rem;
+  }
+
+  .logo-title {
+    font-size: 0.95rem;
+  }
+
+  .logo-subtitle {
+    font-size: 0.6rem;
+  }
+
   .mobile-menu-btn {
     display: block;
+    grid-column: 3;
   }
 
   .nav-content {
@@ -461,15 +609,18 @@ table tr:hover {
     top: 70px;
     left: 0;
     right: 0;
+    bottom: 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     flex-direction: column;
     align-items: stretch;
+    justify-content: flex-start;
     gap: 0;
     padding: 1rem;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    max-height: calc(100vh - 70px);
     overflow-y: auto;
+    grid-column: 1 / -1;
+    z-index: 999;
   }
 
   .nav-content.mobile-open {
@@ -480,45 +631,90 @@ table tr:hover {
     flex-direction: column;
     align-items: stretch;
     gap: 0.5rem;
+    width: 100%;
   }
 
   .nav-link {
     padding: 1rem;
+    font-size: 1rem;
+    justify-content: flex-start;
+  }
+
+  .nav-link span {
+    display: inline;
   }
 
   .user-menu {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.5rem;
+    gap: 0.75rem;
     padding-top: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     margin-top: 1rem;
+    width: 100%;
   }
 
   .user-info {
     justify-content: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .user-name {
+    display: inline;
   }
 
   .btn-logout {
     justify-content: center;
+    padding: 0.75rem 1rem;
+    width: 100%;
+  }
+
+  .btn-logout span {
+    display: inline;
   }
 
   .main-content {
-    padding: 0 1rem;
+    padding: 1rem;
+    margin: 0;
+    width: 100%;
+  }
+  
+  .card {
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 1.5rem;
+  }
+  
+  .page-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .page-header .btn {
+    width: 100%;
   }
 }
 
-@media (max-width: 768px) {
-  .logo-title {
-    font-size: 1.1rem;
+/* Small Mobile */
+@media (max-width: 480px) {
+  .logo-text {
+    display: none;
   }
-
-  .logo-subtitle {
-    font-size: 0.65rem;
-  }
-
+  
   .nav-container {
-    padding: 0 1rem;
+    padding: 0 0.75rem;
+  }
+  
+  .main-content {
+    padding: 0.75rem;
+  }
+  
+  .page-header h2 {
+    font-size: 1.25rem;
   }
 }
 </style>

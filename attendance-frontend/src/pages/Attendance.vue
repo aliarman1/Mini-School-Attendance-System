@@ -104,6 +104,26 @@
         </button>
       </div>
     </div>
+
+    <!-- Success/Error Modal -->
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+      <div class="notification-modal" :class="modalType" @click.stop>
+        <div class="modal-icon">
+          <svg v-if="modalType === 'success'" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <h3>{{ modalTitle }}</h3>
+        <p>{{ modalMessage }}</p>
+        <button class="btn btn-primary" @click="closeModal">OK</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -123,6 +143,10 @@ const attendanceDate = ref(new Date().toISOString().split('T')[0])
 const selectedClass = ref('')
 const selectedSection = ref('')
 const attendance = ref({})
+const showModal = ref(false)
+const modalType = ref('success')
+const modalTitle = ref('')
+const modalMessage = ref('')
 
 onMounted(async () => {
   // Clear any previous data and errors when component mounts
@@ -204,13 +228,28 @@ const submitAttendance = async () => {
       attendances: Object.values(attendance.value)
     })
     
-    alert('Attendance recorded successfully!')
+    // Show success modal
+    modalType.value = 'success'
+    modalTitle.value = 'Success!'
+    modalMessage.value = `Attendance recorded successfully for ${studentStore.students.length} students on ${attendanceDate.value}.`
+    showModal.value = true
+    
+    // Reset form
     attendance.value = {}
     selectedClass.value = ''
     selectedSection.value = ''
+    studentStore.students = []
   } catch (error) {
-    alert('Failed to record attendance: ' + (error.message || 'Unknown error'))
+    // Show error modal
+    modalType.value = 'error'
+    modalTitle.value = 'Error!'
+    modalMessage.value = error.response?.data?.message || error.message || 'Failed to record attendance. Please try again.'
+    showModal.value = true
   }
+}
+
+const closeModal = () => {
+  showModal.value = false
 }
 </script>
 
@@ -260,5 +299,123 @@ const submitAttendance = async () => {
   background: #ecf0f1;
   border-radius: 4px;
   font-size: 1.1rem;
+}
+
+/* Notification Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.notification-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.notification-modal.success .modal-icon {
+  background: #d4edda;
+  color: #28a745;
+}
+
+.notification-modal.error .modal-icon {
+  background: #f8d7da;
+  color: #dc3545;
+}
+
+.notification-modal h3 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.notification-modal.success h3 {
+  color: #28a745;
+}
+
+.notification-modal.error h3 {
+  color: #dc3545;
+}
+
+.notification-modal p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.notification-modal .btn {
+  min-width: 120px;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .notification-modal {
+    padding: 2rem;
+    max-width: 90%;
+  }
+  
+  .modal-icon {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .modal-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .notification-modal h3 {
+    font-size: 1.5rem;
+  }
+  
+  .notification-modal p {
+    font-size: 0.95rem;
+  }
 }
 </style>
