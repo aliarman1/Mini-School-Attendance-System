@@ -23,7 +23,7 @@ class BulkAttendanceRequest extends FormRequest
     {
         return [
             'date' => 'required|date',
-            'recorded_by' => 'required|string|max:255',
+            'recorded_by' => 'nullable|string|max:255',
             'attendances' => 'required|array|min:1',
             'attendances.*.student_id' => 'required|exists:students,id',
             'attendances.*.status' => 'required|in:present,absent,late',
@@ -41,7 +41,6 @@ class BulkAttendanceRequest extends FormRequest
         return [
             'date.required' => 'Attendance date is required',
             'date.date' => 'Invalid date format',
-            'recorded_by.required' => 'Recorder name is required',
             'attendances.required' => 'Attendance records are required',
             'attendances.array' => 'Attendance records must be an array',
             'attendances.min' => 'At least one attendance record is required',

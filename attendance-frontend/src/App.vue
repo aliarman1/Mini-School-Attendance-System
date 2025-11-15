@@ -1,21 +1,38 @@
 <template>
   <div id="app">
-    <nav class="navbar">
+    <nav v-if="authStore.isAuthenticated" class="navbar">
       <div class="container">
         <h1 class="logo">School Attendance System</h1>
         <div class="nav-links">
           <router-link to="/" class="nav-link">Dashboard</router-link>
           <router-link to="/students" class="nav-link">Students</router-link>
           <router-link to="/attendance" class="nav-link">Attendance</router-link>
+          <div class="user-menu">
+            <span class="user-name">{{ authStore.user?.name }}</span>
+            <button @click="handleLogout" class="btn-logout">Logout</button>
+          </div>
         </div>
       </div>
     </nav>
     
-    <main class="main-content">
+    <main :class="{'main-content': authStore.isAuthenticated, 'main-content-full': !authStore.isAuthenticated}">
       <router-view />
     </main>
   </div>
 </template>
+
+<script setup>
+import { useRouter } from 'vue-router'
+import { useAuthStore } from './stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push('/login')
+}
+</script>
 
 <style>
 * {
@@ -73,6 +90,40 @@
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 2rem;
+}
+
+.main-content-full {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 2rem;
+}
+
+.user-name {
+  color: #ecf0f1;
+  font-weight: 500;
+}
+
+.btn-logout {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.btn-logout:hover {
+  background: #c0392b;
 }
 
 .btn {

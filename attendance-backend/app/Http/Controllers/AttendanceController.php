@@ -66,7 +66,8 @@ class AttendanceController extends Controller
     {
         try {
             $attendances = $this->attendanceService->recordBulkAttendance(
-                $request->validated()
+                $request->validated(),
+                $request->user()->id ?? null
             );
             
             return response()->json([

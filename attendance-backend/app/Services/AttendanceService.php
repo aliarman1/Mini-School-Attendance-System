@@ -14,14 +14,14 @@ class AttendanceService
     /**
      * Record bulk attendance
      */
-    public function recordBulkAttendance(array $data): array
+    public function recordBulkAttendance(array $data, $userId = null): array
     {
         DB::beginTransaction();
         
         try {
             $attendances = [];
             $date = Carbon::parse($data['date']);
-            $recordedBy = $data['recorded_by'];
+            $recordedBy = $data['recorded_by'] ?? null;
             
             foreach ($data['attendances'] as $record) {
                 $attendance = Attendance::updateOrCreate(
@@ -33,6 +33,7 @@ class AttendanceService
                         'status' => $record['status'],
                         'note' => $record['note'] ?? null,
                         'recorded_by' => $recordedBy,
+                        'user_id' => $userId,
                     ]
                 );
                 

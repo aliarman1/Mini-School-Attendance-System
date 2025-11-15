@@ -18,10 +18,6 @@
             <option value="10B">Class 10B</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>Recorded By</label>
-          <input v-model="recordedBy" class="form-control" placeholder="Your name" />
-        </div>
       </div>
 
       <div v-if="studentStore.loading" class="loading">Loading students...</div>
@@ -95,7 +91,7 @@
         <button 
           class="btn btn-success btn-lg"
           @click="submitAttendance"
-          :disabled="attendanceStore.loading || !recordedBy">
+          :disabled="attendanceStore.loading">
           {{ attendanceStore.loading ? 'Saving...' : 'Submit Attendance' }}
         </button>
       </div>
@@ -113,7 +109,6 @@ const attendanceStore = useAttendanceStore()
 
 const attendanceDate = ref(new Date().toISOString().split('T')[0])
 const selectedClass = ref('')
-const recordedBy = ref('Teacher')
 const attendance = ref({})
 
 onMounted(() => {
@@ -180,15 +175,9 @@ const updatePercentage = () => {
 }
 
 const submitAttendance = async () => {
-  if (!recordedBy.value.trim()) {
-    alert('Please enter your name')
-    return
-  }
-
   try {
     await attendanceStore.recordBulkAttendance({
       date: attendanceDate.value,
-      recorded_by: recordedBy.value,
       attendances: Object.values(attendance.value)
     })
     
@@ -204,7 +193,7 @@ const submitAttendance = async () => {
 <style scoped>
 .attendance-form {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin-bottom: 2rem;
 }
