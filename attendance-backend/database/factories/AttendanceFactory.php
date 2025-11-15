@@ -17,7 +17,7 @@ class AttendanceFactory extends Factory
             'date' => fake()->dateTimeBetween('-30 days', 'now')->format('Y-m-d'),
             'status' => fake()->randomElement(['present', 'absent', 'late']),
             'note' => fake()->optional(0.3)->sentence(),
-            'recorded_by' => fake()->name(),
+            'recorded_by_id' => \App\Models\User::factory(),
         ];
     }
 }
