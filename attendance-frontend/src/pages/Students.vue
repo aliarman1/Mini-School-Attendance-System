@@ -86,60 +86,62 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="showAddModal" class="modal">
+    <div v-if="showAddModal" class="modal" @click.self="closeModal">
       <div class="modal-content">
         <h3>{{ editMode ? 'Edit Student' : 'Add New Student' }}</h3>
         <form @submit.prevent="saveStudent">
-          <div class="form-group">
-            <label>Student ID</label>
-            <input v-model="formData.student_id" class="form-control" required />
-          </div>
-          <div class="form-group">
-            <label>Name</label>
-            <input v-model="formData.name" class="form-control" required />
-          </div>
-          <div class="form-group">
-            <label>Class</label>
-            <select v-model="formData.class_id" class="form-control" required>
-              <option value="">Select a class</option>
-              <option v-for="cls in classStore.classes" :key="cls.id" :value="cls.id">
-                Class {{ cls.name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Section</label>
-            <select v-model="formData.section_id" class="form-control" required>
-              <option value="">Select a section</option>
-              <option v-for="section in sectionStore.sections" :key="section.id" :value="section.id">
-                {{ section.name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Photo</label>
-            <input 
-              type="file" 
-              @change="handleFileChange" 
-              accept="image/jpeg,image/png,image/jpg"
-              class="form-control"
-              ref="fileInput"
-            />
-            <small class="form-text">Max size: 2MB (JPEG, PNG, JPG)</small>
-            <div v-if="photoPreview" class="photo-preview">
-              <img :src="photoPreview" alt="Preview" />
-              <button type="button" @click="removePhoto" class="btn btn-sm btn-danger">Remove</button>
+          <div class="form-body">
+            <div class="form-group">
+              <label>Student ID <span class="required">*</span></label>
+              <input v-model="formData.student_id" class="form-control" required />
             </div>
-            <div v-else-if="editMode && formData.existingPhoto" class="photo-preview">
-              <img :src="formData.existingPhoto" alt="Current photo" />
-              <p>Current photo</p>
+            <div class="form-group">
+              <label>Name <span class="required">*</span></label>
+              <input v-model="formData.name" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label>Class <span class="required">*</span></label>
+              <select v-model="formData.class_id" class="form-control" required>
+                <option value="">Select a class</option>
+                <option v-for="cls in classStore.classes" :key="cls.id" :value="cls.id">
+                  Class {{ cls.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Section <span class="required">*</span></label>
+              <select v-model="formData.section_id" class="form-control" required>
+                <option value="">Select a section</option>
+                <option v-for="section in sectionStore.sections" :key="section.id" :value="section.id">
+                  {{ section.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Photo</label>
+              <input 
+                type="file" 
+                @change="handleFileChange" 
+                accept="image/jpeg,image/png,image/jpg"
+                class="form-control"
+                ref="fileInput"
+              />
+              <small class="form-text">Max size: 2MB (JPEG, PNG, JPG)</small>
+              <div v-if="photoPreview" class="photo-preview">
+                <img :src="photoPreview" alt="Preview" />
+                <button type="button" @click="removePhoto" class="btn btn-sm btn-danger">Remove</button>
+              </div>
+              <div v-else-if="editMode && formData.existingPhoto" class="photo-preview">
+                <img :src="formData.existingPhoto" alt="Current photo" />
+                <p>Current photo</p>
+              </div>
             </div>
           </div>
           <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" @click="closeModal">Cancel</button>
             <button type="submit" class="btn btn-success" :disabled="studentStore.loading">
-              {{ studentStore.loading ? 'Saving...' : 'Save' }}
+              {{ studentStore.loading ? 'Saving...' : 'Save Student' }}
             </button>
-            <button type="button" class="btn" @click="closeModal">Cancel</button>
           </div>
         </form>
       </div>
@@ -367,21 +369,56 @@ const goToPage = async (page) => {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  overflow-y: auto;
+  padding: 2rem 0;
 }
 
 .modal-content {
   background: white;
-  padding: 2rem;
-  border-radius: 8px;
+  padding: 0;
+  border-radius: 12px;
   width: 500px;
   max-width: 90%;
+  max-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-content h3 {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin: 0;
+  font-size: 1.25rem;
+  color: #111827;
+  background: #f9fafb;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+}
+
+.form-body {
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .modal-actions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 0 0 12px 12px;
+  position: sticky;
+  bottom: 0;
 }
 
 .student-photo {
@@ -432,5 +469,24 @@ const goToPage = async (page) => {
   margin-top: 0.25rem;
   font-size: 0.875rem;
   color: #6c757d;
+}
+
+.required {
+  color: #ef4444;
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.info-message {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
 }
 </style>

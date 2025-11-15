@@ -66,46 +66,48 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="showAddModal" class="modal">
+    <div v-if="showAddModal" class="modal" @click.self="closeModal">
       <div class="modal-content">
         <h3>{{ editMode ? 'Edit Class' : 'Add New Class' }}</h3>
         <form @submit.prevent="saveClass">
-          <div class="form-group">
-            <label>Class Name <span class="required">*</span></label>
-            <input 
-              v-model="formData.name" 
-              class="form-control" 
-              placeholder="e.g., 9, 10, 11, 12"
-              required 
-            />
-            <small class="form-text">Grade level (unique identifier)</small>
-          </div>
-          <div class="form-group">
-            <label>Capacity</label>
-            <input 
-              v-model.number="formData.capacity" 
-              type="number" 
-              class="form-control" 
-              min="1"
-              max="100"
-              placeholder="Default: 30"
-            />
-            <small class="form-text">Maximum number of students (1-100)</small>
-          </div>
-          <div class="form-group">
-            <label>Description</label>
-            <textarea 
-              v-model="formData.description" 
-              class="form-control" 
-              rows="3"
-              placeholder="Optional description..."
-            ></textarea>
+          <div class="form-body">
+            <div class="form-group">
+              <label>Class Name <span class="required">*</span></label>
+              <input 
+                v-model="formData.name" 
+                class="form-control" 
+                placeholder="e.g., 9, 10, 11, 12"
+                required 
+              />
+              <small class="form-text">Grade level (unique identifier)</small>
+            </div>
+            <div class="form-group">
+              <label>Capacity</label>
+              <input 
+                v-model.number="formData.capacity" 
+                type="number" 
+                class="form-control" 
+                min="1"
+                max="100"
+                placeholder="Default: 30"
+              />
+              <small class="form-text">Maximum number of students (1-100)</small>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea 
+                v-model="formData.description" 
+                class="form-control" 
+                rows="3"
+                placeholder="Optional description..."
+              ></textarea>
+            </div>
           </div>
           <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" @click="closeModal">Cancel</button>
             <button type="submit" class="btn btn-success" :disabled="classStore.loading">
-              {{ classStore.loading ? 'Saving...' : 'Save' }}
+              {{ classStore.loading ? 'Saving...' : 'Save Class' }}
             </button>
-            <button type="button" class="btn" @click="closeModal">Cancel</button>
           </div>
         </form>
       </div>
@@ -260,23 +262,56 @@ const goToPage = async (page) => {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  overflow-y: auto;
+  padding: 2rem 0;
 }
 
 .modal-content {
   background: white;
-  padding: 2rem;
-  border-radius: 8px;
+  padding: 0;
+  border-radius: 12px;
   width: 500px;
   max-width: 90%;
-  max-height: 90vh;
+  max-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-content h3 {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin: 0;
+  font-size: 1.25rem;
+  color: #111827;
+  background: #f9fafb;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+}
+
+.form-body {
+  padding: 1.5rem 2rem;
   overflow-y: auto;
+  flex: 1;
 }
 
 .modal-actions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 0 0 12px 12px;
+  position: sticky;
+  bottom: 0;
 }
 
 .required {
@@ -300,5 +335,14 @@ textarea.form-control {
   padding: 2rem;
   color: #666;
   font-size: 1rem;
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #4b5563;
 }
 </style>
