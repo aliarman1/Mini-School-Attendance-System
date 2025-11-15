@@ -1,0 +1,2 @@
+attendance-backend/   ← Laravel API (students, attendance)
+attendance-frontend/  ← Vue SPA (students list, attendance page, dashboard)
